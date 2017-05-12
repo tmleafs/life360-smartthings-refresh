@@ -103,4 +103,5 @@ private getState(boolean present) {
 
 private refresh() {
 	parent.refresh()
+	return null
 }
