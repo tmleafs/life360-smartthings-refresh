@@ -2,6 +2,8 @@
  *  Copyright 2015 SmartThings
  *
  *	TMLEAFS REFRESH PATCH 06-12-2016 V1.1
+ *	Updated Code to match Smartthings updates 12-05-2017 V1.2
+ *	Added Null Return on refresh to fix WebCoRE error 12-05-2017 V1.2
  *
  *  Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except
  *  in compliance with the License. You may obtain a copy of the License at:
@@ -34,8 +36,8 @@ metadata {
 
 	tiles {
 		standardTile("presence", "device.presence", width: 2, height: 2, canChangeBackground: true) {
-			state("present", labelIcon:"st.presence.tile.mobile-present", backgroundColor:"#53a7c0")
-			state("not present", labelIcon:"st.presence.tile.mobile-not-present", backgroundColor:"#ebeef2")
+			state("present", labelIcon:"st.presence.tile.mobile-present", backgroundColor:"#00A0DC")
+			state("not present", labelIcon:"st.presence.tile.mobile-not-present", backgroundColor:"#ffffff")
 		}
         
         standardTile("refresh", "device.switch", inactiveLabel: false, decoration: "flat", width: 1, height: 1) {
@@ -48,7 +50,7 @@ metadata {
 }
 
 def generatePresenceEvent(boolean present) {
-	log.debug "Here in generatePresenceEvent!"
+	log.info "Life360 generatePresenceEvent($present)"
 	def value = formatValue(present)
 	def linkText = getLinkText(device)
 	def descriptionText = formatDescriptionText(linkText, present)
