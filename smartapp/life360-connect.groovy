@@ -2,7 +2,8 @@
  *  life360
  *
  *	TMLEAFS REFRESH PATCH 06-12-2016 V1.1
- *
+ *	Updated Code to match Smartthings updates 12-05-2017 V1.2
+ *	
  *  Copyright 2014 Jeff's Account
  *
  *  Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except
@@ -291,12 +292,12 @@ def initializeLife360Connection() {
        		state.life360AccessToken = result.data.access_token
             return true;
    		}
-		log.debug "Response=${result.data}"
+		log.info "Life360 initializeLife360Connection, response=${result.data}"
         return false;
         
     }
     catch (e) {
-       log.debug e
+       log.error "Life360 initializeLife360Connection, error: $e"
        return false;
     }
 
@@ -658,7 +659,7 @@ def generateInitialEvent (member, childDevice) {
     
     try { // we are going to just ignore any errors
     
-    	log.debug "Generate Initial Event for New Device for Member = ${member.id}"
+    	log.info "Life360 generateInitialEvent($member, $childDevice)"
         
         def place = state.places.find{it.id==settings.place}
         
@@ -679,6 +680,8 @@ def generateInitialEvent (member, childDevice) {
         	// log.debug "Distance Away = ${distanceAway}"
   
   			boolean isPresent = (distanceAway <= placeRadius)
+
+			log.info "Life360 generateInitialEvent, member: ($memberLatitude, $memberLongitude), place: ($placeLatitude, $placeLongitude), radius: $placeRadius, dist: $distanceAway, present: $isPresent"
                 
         	// log.debug "External Id=${app.id}:${member.id}"
         
@@ -720,7 +723,7 @@ def haversine(lat1, lon1, lat2, lon2) {
 
 def placeEventHandler() {
 
-	log.debug "In placeEventHandler method."
+	log.info "Life360 placeEventHandler: params=$params, settings.place=$settings.place"
 
 	// the POST to this end-point will look like:
     // POST http://test.com/webhook?circleId=XXXX&placeId=XXXX&userId=XXXX&direction=arrive
@@ -731,8 +734,6 @@ def placeEventHandler() {
     def direction = params?.direction
     def timestamp = params?.timestamp
     
-    log.debug "Life360 Event: Circle: ${circleId}, Place: ${placeId}, User: ${userId}, Direction: ${direction}"
-
     if (placeId == settings.place) {
 
 		def presenceState = (direction=="in")
@@ -747,10 +748,10 @@ def placeEventHandler() {
 
 		if (deviceWrapper) {
 			deviceWrapper.generatePresenceEvent(presenceState)
-    		log.debug "Event raised on child device: ${externalId}"
+    		log.debug "Life360 event raised on child device: ${externalId}"
 		}
    		else {
-    		log.debug "Couldn't find child device associated with inbound Life360 event."
+    		log.warn "Life360 couldn't find child device associated with inbound Life360 event."
     	}
     }
 
