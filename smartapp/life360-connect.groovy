@@ -19,7 +19,7 @@
 
 definition(
     name: "Life360 (Connect)",
-    namespace: "smartthings",
+    namespace: "tmleafs",
     author: "SmartThings",
     description: "Life360 Service Manager",
 	category: "SmartThings Labs",
