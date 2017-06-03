@@ -21,7 +21,7 @@
  */
  
 metadata {
-	definition (name: "Life360 User", namespace: "SmartThings", author: "SmartThings") {
+	definition (name: "Life360 User", namespace: "smartthings", author: "SmartThings") {
 		capability "Presence Sensor"
 		capability "Sensor"
         capability "Refresh"
@@ -62,7 +62,8 @@ def generatePresenceEvent(boolean present) {
 		unit: null,
 		linkText: linkText,
 		descriptionText: descriptionText,
-		handlerName: handlerName
+		handlerName: handlerName,
+        isStateChange: true
 	]
 	log.debug "Generating Event: ${results}"
 	sendEvent (results)
@@ -103,5 +104,5 @@ private getState(boolean present) {
 
 def refresh() {
 	parent.refresh()
-	return null
+    return null
 }
