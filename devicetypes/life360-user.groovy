@@ -101,7 +101,7 @@ private getState(boolean present) {
     	return "left"
 }
 
-private refresh() {
+def refresh() {
 	parent.refresh()
 	return null
 }
