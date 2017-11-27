@@ -63,7 +63,6 @@ def generatePresenceEvent(boolean present) {
 		linkText: linkText,
 		descriptionText: descriptionText,
 		handlerName: handlerName,
-        isStateChange: true
 	]
 	log.debug "Generating Event: ${results}"
 	sendEvent (results)
