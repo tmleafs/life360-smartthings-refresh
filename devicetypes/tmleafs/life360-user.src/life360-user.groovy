@@ -21,7 +21,7 @@
  */
  
 metadata {
-	definition (name: "Life360 User", namespace: "smartthings", author: "SmartThings") {
+	definition (name: "Life360 User", namespace: "tmleafs", author: "tmleafs") {
 		capability "Presence Sensor"
 		capability "Sensor"
         capability "Refresh"
