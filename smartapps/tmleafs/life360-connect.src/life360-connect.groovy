@@ -671,13 +671,13 @@ def generateInitialEvent (member, childDevice) {
             def placeLongitude = new Float (place.longitude)
             def placeRadius = new Float (place.radius)
         
-        	// log.debug "Member Location = ${memberLatitude}/${memberLongitude}"
-            // log.debug "Place Location = ${placeLatitude}/${placeLongitude}"
-            // log.debug "Place Radius = ${placeRadius}"
+        	log.debug "Member Location = ${memberLatitude}/${memberLongitude}"
+            log.debug "Place Location = ${placeLatitude}/${placeLongitude}"
+            log.debug "Place Radius = ${placeRadius}"
         
         	def distanceAway = haversine(memberLatitude, memberLongitude, placeLatitude, placeLongitude)*1000 // in meters
   
-        	// log.debug "Distance Away = ${distanceAway}"
+        	log.debug "Distance Away = ${distanceAway}"
   
   			boolean isPresent = (distanceAway <= placeRadius)
 
@@ -689,7 +689,7 @@ def generateInitialEvent (member, childDevice) {
 		
         	// log.debug "Child Device = ${childDevice2}"
         
-        	childDevice?.generatePresenceEvent(isPresent)
+        	childDevice?.generatePresenceEvent(isPresent, distanceAway)
         
         	// log.debug "After generating presence event."
             
@@ -747,7 +747,7 @@ def placeEventHandler() {
 		// invoke the generatePresenceEvent method on the child device
 
 		if (deviceWrapper) {
-			deviceWrapper.generatePresenceEvent(presenceState)
+			deviceWrapper.generatePresenceEvent(presenceState, 0)
     		log.debug "Life360 event raised on child device: ${externalId}"
 		}
    		else {
