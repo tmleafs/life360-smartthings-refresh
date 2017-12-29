@@ -1,6 +1,9 @@
 /**
  *  life360
  *
+ *	BTRIAL DISTANCE AND SLEEP PATCH 29-12-2017
+ *	Updated Code to handle distance from, and sleep functionality
+ *
  *	TMLEAFS REFRESH PATCH 06-12-2016 V1.1
  *	Updated Code to match Smartthings updates 12-05-2017 V1.2
  *	
@@ -19,8 +22,8 @@
 
 definition(
     name: "Life360 (Connect)",
-    namespace: "tmleafs",
-    author: "tmleafs",
+    namespace: "btrial",
+    author: "btrial",
     description: "Life360 Service Manager",
 	category: "SmartThings Labs",
     iconUrl: "https://s3.amazonaws.com/smartapp-icons/Partner/life360.png",
