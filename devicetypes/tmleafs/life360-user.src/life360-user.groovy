@@ -1,6 +1,9 @@
 /**
  *  Copyright 2015 SmartThings
  *
+ *	BTRIAL DISTANCE AND SLEEP PATCH 29-12-2017
+ *	Updated Code to handle distance from, and sleep functionality
+ *
  *	TMLEAFS REFRESH PATCH 06-12-2016 V1.1
  *	Updated Code to match Smartthings updates 12-05-2017 V1.2
  *	Added Null Return on refresh to fix WebCoRE error 12-05-2017 V1.2
@@ -21,7 +24,7 @@
  */
  
 metadata {
-	definition (name: "Life360 User", namespace: "tmleafs", author: "tmleafs") {
+	definition (name: "Life360 User", namespace: "btrial", author: "btrial") {
 		capability "Presence Sensor"
 		capability "Sensor"
         capability "Refresh"
