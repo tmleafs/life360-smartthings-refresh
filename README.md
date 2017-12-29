@@ -1,7 +1,11 @@
-# life360-smartthings-refresh
+# life360-smartthings-refresh-distance-sleep
 Adding a refresh function to life360 for smartthings
 
-If you installed Life360 though the IDE just update your DH and App with this code and your have a refresh button
+If you installed Life360 though the IDE just update your DH and App with this code and your have:
+1) refresh button,
+2) distance from your chosen place (can be used in webCore),
+3) sleep / awake status (can be used in webCore) 
+4) last location update date/time
 
 If you installed though the smartthings marketplace its best to remove all Life360 devices and the app and then install this DH and app though the IDE, enable OAuth on the app, publish to me and install the app from the "My Apps" in the marketplace.
 
