@@ -1,5 +1,4 @@
 # life360-smartthings-refresh-distance-sleep
-Adding a refresh function to life360 for smartthings
 
 If you installed Life360 though the IDE just update your DH and App with this code and your have:
 1) refresh button,
