@@ -10,7 +10,7 @@ If you installed though the smartthings marketplace its best to remove all Life3
 
 Your end up with this for each life360 device (Please note doesnt matter which device you use to refresh it will refresh all life360 devices)
 <p align="center">
-  <img src="https://raw.githubusercontent.com/tmleafs/life360-smartthings-refresh/master/images/preview.png" width="350"/>
+  <img src="https://raw.githubusercontent.com/btrial/life360-smartthings-refresh-distance-sleep/master/images/preview.png" width="350"/>
 </p>
 
 Using CoRE I was able too use a Presence Sensor as Redundancy to bring the Life360 device back in sync
@@ -18,13 +18,13 @@ Other ideas are run a refresh at set times like 15 mins after you go to work eve
   
 The piston runs after the presence sensor has left and the life360 device hasnt left after 10mins, it refreshes if it didnt work it sends a notifcation
 <p align="center">
-  <img src="https://raw.githubusercontent.com/tmleafs/life360-smartthings-refresh/master/images/core.jpg" width="350"/>
+  <img src="https://raw.githubusercontent.com/btrial/life360-smartthings-refresh-distance-sleep/master/images/core.jpg" width="350"/>
 </p>
 
 As you can see from the two screenshots after 10mins the piston ran and the life360 device updated
 
 <p align="center">
-  <img src="https://raw.githubusercontent.com/tmleafs/life360-smartthings-refresh/master/images/sensor.png" width="350"/>
-  <img src="https://raw.githubusercontent.com/tmleafs/life360-smartthings-refresh/master/images/mobile.png" width="350"/>
+  <img src="https://raw.githubusercontent.com/btrial/life360-smartthings-refresh-distance-sleep/master/images/sensor.png" width="350"/>
+  <img src="https://raw.githubusercontent.com/btrial/life360-smartthings-refresh-distance-sleep/master/images/mobile.png" width="350"/>
 </p>
 
