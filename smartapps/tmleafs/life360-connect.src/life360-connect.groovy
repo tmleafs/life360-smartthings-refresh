@@ -22,8 +22,8 @@
 
 definition(
     name: "Life360 (Connect)",
-    namespace: "btrial",
-    author: "btrial",
+    namespace: "tmleafs",
+    author: "tmleafs",
     description: "Life360 Service Manager",
 	category: "SmartThings Labs",
     iconUrl: "https://s3.amazonaws.com/smartapp-icons/Partner/life360.png",
