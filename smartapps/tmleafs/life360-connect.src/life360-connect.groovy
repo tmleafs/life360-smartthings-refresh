@@ -1,6 +1,9 @@
 /**
  *  life360
  *
+ *	BTRIAL DISTANCE AND SLEEP PATCH 29-12-2017
+ *	Updated Code to handle distance from, and sleep functionality
+ *
  *	TMLEAFS REFRESH PATCH 06-12-2016 V1.1
  *	Updated Code to match Smartthings updates 12-05-2017 V1.2
  *	
@@ -671,13 +674,13 @@ def generateInitialEvent (member, childDevice) {
             def placeLongitude = new Float (place.longitude)
             def placeRadius = new Float (place.radius)
         
-        	// log.debug "Member Location = ${memberLatitude}/${memberLongitude}"
-            // log.debug "Place Location = ${placeLatitude}/${placeLongitude}"
-            // log.debug "Place Radius = ${placeRadius}"
+        	log.debug "Member Location = ${memberLatitude}/${memberLongitude}"
+            log.debug "Place Location = ${placeLatitude}/${placeLongitude}"
+            log.debug "Place Radius = ${placeRadius}"
         
         	def distanceAway = haversine(memberLatitude, memberLongitude, placeLatitude, placeLongitude)*1000 // in meters
   
-        	// log.debug "Distance Away = ${distanceAway}"
+        	log.debug "Distance Away = ${distanceAway}"
   
   			boolean isPresent = (distanceAway <= placeRadius)
 
@@ -689,7 +692,7 @@ def generateInitialEvent (member, childDevice) {
 		
         	// log.debug "Child Device = ${childDevice2}"
         
-        	childDevice?.generatePresenceEvent(isPresent)
+        	childDevice?.generatePresenceEvent(isPresent, distanceAway)
         
         	// log.debug "After generating presence event."
             
@@ -747,7 +750,7 @@ def placeEventHandler() {
 		// invoke the generatePresenceEvent method on the child device
 
 		if (deviceWrapper) {
-			deviceWrapper.generatePresenceEvent(presenceState)
+			deviceWrapper.generatePresenceEvent(presenceState, 0)
     		log.debug "Life360 event raised on child device: ${externalId}"
 		}
    		else {
