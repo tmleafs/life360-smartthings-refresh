@@ -455,7 +455,7 @@ def installed() {
        	// create the device
         if (member) {
         
-       		def childDevice = addChildDevice("smartthings", "Life360 User", "${app.id}.${member.id}",null,[name:member.firstName, completedSetup: true])
+       		def childDevice = addChildDevice("tmleafs", "Life360 User", "${app.id}.${member.id}",null,[name:member.firstName, completedSetup: true])
         
         	// save the memberId on the device itself so we can find easily later
         	// childDevice.setMemberId(member.id)
