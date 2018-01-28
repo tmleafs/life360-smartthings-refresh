@@ -23,6 +23,10 @@
  *  Date: 2013-08-15
  */
  
+preferences {
+	input name: "units", type: "enum", title: "Distance Units", description: "Miles or Kilometers", required: false, options:["Kilometers","Miles"]
+} 
+ 
 metadata {
 	definition (name: "Life360 User", namespace: "tmleafs", author: "tmleafs") {
 		capability "Presence Sensor"
@@ -30,6 +34,8 @@ metadata {
         capability "Refresh"
 		capability "Sleep Sensor"
 		attribute "distanceMetric", "Number"
+   		attribute "distanceKm", "Number"
+		attribute "distanceMiles", "Number"
 		command "refresh"
 		command "asleep"
         command "awake"
@@ -106,11 +112,19 @@ def generatePresenceEvent(boolean present, homeDistance) {
 	log.debug "Generating Event: ${results}"
 	sendEvent (results)
 	
+    if(units == "Kilometers" || units == null || units == ""){
 	def status = sprintf("%.2f", homeDistance / 1000) + " km from: Home"
-	if (status != device.currentValue('status')) {
-    	sendEvent( name: "status", value: status, isStateChange: true, displayed: false )
-    }
+    sendEvent( name: "status", value: status, isStateChange: true, displayed: false )
+    }else{
+   	def status = sprintf("%.2f", (homeDistance / 1000) / 1.609344) + " Miles from: Home"
+   	sendEvent( name: "status", value: status, isStateChange: true, displayed: false )
+	}
 	
+    def km = sprintf("%.2f", homeDistance / 1000)
+    sendEvent( name: "distanceKm", value: km, isStateChange: true, displayed: false )
+    def miles = sprintf("%.2f", (homeDistance / 1000) / 1.609344)
+   	sendEvent( name: "distanceMiles", value: miles, isStateChange: true, displayed: false )
+
 	sendEvent( name: "distanceMetric", value: homeDistance, isStateChange: true, displayed: false )
 	
 	sendEvent( name: "lastLocationUpdate", value: "Last location update on:\r\n${formatLocalTime("MM/dd/yyyy @ h:mm:ss a")}", displayed: false ) 
