@@ -48,7 +48,7 @@ metadata {
 	}
 
 	tiles {
-		multiAttributeTile(name: "display", width: 2, height: 2, canChangeBackground: true) {
+		multiAttributeTile(name: "display", type: "generic", width: 2, height: 2, canChangeBackground: true) {
 			tileAttribute ("device.display", key: "PRIMARY_CONTROL") {
             	attributeState "present, not sleeping", label: 'Home', icon:"st.nest.nest-away", backgroundColor:"#c0ceb9"
 				attributeState "present, sleeping", label: 'Home (asleep)', icon:"st.Bedroom.bedroom2", backgroundColor:"#6879a3"
