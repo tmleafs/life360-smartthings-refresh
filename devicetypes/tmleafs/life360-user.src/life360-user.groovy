@@ -24,22 +24,25 @@
  */
  
 preferences {
+	input title:"Distance", description:"This feature allows you change the display of distance to either Miles or KM. Please note, any changes will take effect only on the NEXT update or forced refresh.", type:"paragraph", element:"paragraph"
 	input name: "units", type: "enum", title: "Distance Units", description: "Miles or Kilometers", required: false, options:["Kilometers","Miles"]
 } 
  
 metadata {
 	definition (name: "Life360 User", namespace: "tmleafs", author: "tmleafs") {
-		capability "Presence Sensor"
-		capability "Sensor"
+	capability "Presence Sensor"
+	capability "Sensor"
         capability "Refresh"
-		capability "Sleep Sensor"
-		attribute "distanceMetric", "Number"
-   		attribute "distanceKm", "Number"
-		attribute "distanceMiles", "Number"
-		command "refresh"
-		command "asleep"
+	capability "Sleep Sensor"
+	attribute "distanceMetric", "Number"
+   	attribute "distanceKm", "Number"
+	attribute "distanceMiles", "Number"
+	
+	command "refresh"
+	command "asleep"
         command "awake"
         command "toggleSleeping"
+	
 	}
 
 	simulator {
@@ -50,15 +53,14 @@ metadata {
 	tiles {
 		multiAttributeTile(name: "display", type: "generic", width: 2, height: 2, canChangeBackground: true) {
 			tileAttribute ("device.display", key: "PRIMARY_CONTROL") {
-            	attributeState "present, not sleeping", label: 'Home', icon:"st.nest.nest-away", backgroundColor:"#c0ceb9"
+            			attributeState "present, not sleeping", label: 'Home', icon:"st.nest.nest-away", backgroundColor:"#c0ceb9"
 				attributeState "present, sleeping", label: 'Home (asleep)', icon:"st.Bedroom.bedroom2", backgroundColor:"#6879a3"
 				attributeState "not present", label: 'Away', icon:"st.Office.office5", backgroundColor:"#777777"
-            }
-       		tileAttribute ("device.status", key: "SECONDARY_CONTROL") {
-				attributeState "default", 
-					label:'${currentValue}'
+            		}
+       			tileAttribute ("device.status", key: "SECONDARY_CONTROL") {
+				attributeState "default", label:'${currentValue}'
 			}
-        }
+        	}
 		
 		standardTile("presence", "device.presence", width: 4, height: 2, canChangeBackground: true) {
 			state("present", labelIcon:"st.presence.tile.mobile-present", backgroundColor:"#00A0DC")
@@ -74,7 +76,7 @@ metadata {
 			state("default", label: '${currentValue}')
 		}
         
-        standardTile("refresh", "device.switch", inactiveLabel: false, decoration: "flat", width: 2, height: 1) {
+        	standardTile("refresh", "device.switch", inactiveLabel: false, decoration: "flat", width: 2, height: 1) {
 			state "default", label:"", action:"refresh.refresh", icon:"st.secondary.refresh"
 		}
 
