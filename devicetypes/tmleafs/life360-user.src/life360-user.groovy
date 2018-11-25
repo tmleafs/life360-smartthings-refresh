@@ -7,6 +7,7 @@
  *	TMLEAFS REFRESH PATCH 06-12-2016 V1.1
  *	Updated Code to match Smartthings updates 12-05-2017 V1.2
  *	Added Null Return on refresh to fix WebCoRE error 12-05-2017 V1.2
+ *	Added updateMember function that pulls all usefull information Life360 provides for webCoRE use V2.0
  *
  *  Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except
  *  in compliance with the License. You may obtain a copy of the License at:
@@ -32,16 +33,28 @@ metadata {
 	definition (name: "Life360 User", namespace: "tmleafs", author: "tmleafs") {
 	capability "Presence Sensor"
 	capability "Sensor"
-        capability "Refresh"
+    capability "Refresh"
 	capability "Sleep Sensor"
 	attribute "distanceMetric", "Number"
    	attribute "distanceKm", "Number"
 	attribute "distanceMiles", "Number"
-	
+	attribute "address1", "String"
+  	attribute "address2", "String"
+  	attribute "battery", "number"
+   	attribute "charge", "number"
+   	attribute "lastCheckin", "number"
+   	attribute "inTransit", "number"
+   	attribute "isDriving", "number"
+   	attribute "latitude", "number"
+   	attribute "longitude", "number"
+   	attribute "since", "number"
+   	attribute "speed", "number"
+   	attribute "wifiState", "number"
+
 	command "refresh"
 	command "asleep"
-        command "awake"
-        command "toggleSleeping"
+    command "awake"
+    command "toggleSleeping"
 	
 	}
 
@@ -76,12 +89,76 @@ metadata {
 			state("default", label: '${currentValue}')
 		}
         
-        	standardTile("refresh", "device.switch", inactiveLabel: false, decoration: "flat", width: 2, height: 1) {
+        standardTile("refresh", "device.switch", inactiveLabel: false, decoration: "flat", width: 2, height: 1) {
 			state "default", label:"", action:"refresh.refresh", icon:"st.secondary.refresh"
 		}
 
+		standardTile("blank", "blank", height: 1, width: 1, decoration: "flat") {
+            state("default", label:'')
+        }
+		
+        standardTile("information", "information", height: 1, width: 4, decoration: "flat") {
+            state("default", label:'Below is information that can be used in webCoRE')
+        }
+        
+        standardTile("blank", "blank", height: 1, width: 1, decoration: "flat") {
+            state("default", label:'')
+        }
+        
+        standardTile("address1", "device.address1", height: 1, width: 3, decoration: "flat") {
+            state("default", label:'Address 1: ${currentValue}')
+        }
+        
+        standardTile("address2", "device.address2", height: 1, width: 3, decoration: "flat") {
+            state("default", label:'Address 2: ${currentValue}')
+        }
+        
+        standardTile("battery", "device.battery", height: 1, width: 2, decoration: "flat") {
+            state("default", label:'Battery: ${currentValue}%')
+        }
+        
+        standardTile("charge", "device.charge", height: 1, width: 2, decoration: "flat") {
+            state "False", label: 'Charging: No'
+            state "True", label: 'Charging: Yes'
+        }
+        
+         standardTile("wifistate", "device.wifiState", height: 1, width: 2, decoration: "flat") {
+            state "False", label: 'Wifi: Off'
+            state "True", label: 'Wifi: On'
+        }
+        
+        standardTile("lastcheckin", "device.lastCheckin", height: 1, width: 3, decoration: "flat") {
+            state("default", label:'Last Server Checkin: ${currentValue}')
+        }
+        
+        standardTile("since", "device.since", height: 1, width: 3, decoration: "flat") {
+            state("default", label:'In Location Since: ${currentValue}')
+        }
+        
+        standardTile("moving", "device.inTransit", height: 1, width: 2, decoration: "flat") {
+            state "False", label: 'Moving: No'
+            state "True", label: 'Moving: Yes'
+        }
+        
+        standardTile("driving", "device.isDriving", height: 1, width: 2, decoration: "flat") {
+            state "False", label: 'Driving: No'
+            state "True", label: 'Driving: Yes'
+        }
+        
+        standardTile("speed", "device.speed", height: 1, width: 2, decoration: "flat") {
+            state("default", label:'Speed: ${currentValue}')
+        }
+        
+        standardTile("latitude", "device.latitude", height: 1, width: 3, decoration: "flat") {
+            state("default", label:'Latitude: ${currentValue}')
+        }
+        
+        standardTile("longitude", "device.longitude", height: 1, width: 3, decoration: "flat") {
+            state("default", label:'Longitude: ${currentValue}')
+        }
+
 		main "presence"
-		details(["display", "presence", "sleeping", "lastLocationUpdate", "refresh"])
+		details(["display", "presence", "sleeping", "lastLocationUpdate", "refresh", "blank","information", "blank", "address1", "address2", "battery", "charge", "wifistate", "lastcheckin", "since", "moving", "driving", "speed", "latitude", "longitude", "testing"])
 	}
 }
 
@@ -130,6 +207,22 @@ def generatePresenceEvent(boolean present, homeDistance) {
 	sendEvent( name: "distanceMetric", value: homeDistance, isStateChange: true, displayed: false )
 	
 	sendEvent( name: "lastLocationUpdate", value: "Last location update on:\r\n${formatLocalTime("MM/dd/yyyy @ h:mm:ss a")}", displayed: false ) 
+}
+
+private extraInfo(address1,address2,battery,charge,endTimestamp,inTransit,isDriving,latitude,longitude,since,speed,wifiState){
+	log.debug "extrainfo = Address 1 = $address1 | Address 2 = $address2 | Battery = $battery | Charging = $charge | Last Checkin = $endTimestamp | Moving = $inTransit | Driving = $isDriving | Latitude = $latitude | Longitude = $longitude | Since = $since | Speed = $speed | Wifi = $wifiState"
+   	sendEvent( name: "address1", value: address1, isStateChange: true, displayed: false )
+    sendEvent( name: "address2", value: address2, isStateChange: true, displayed: false )
+   	sendEvent( name: "battery", value: battery, isStateChange: true, displayed: false )
+   	sendEvent( name: "charge", value: charge, isStateChange: true, displayed: false )
+   	sendEvent( name: "lastCheckin", value: endTimestamp, isStateChange: true, displayed: false )
+   	sendEvent( name: "inTransit", value: inTransit, isStateChange: true, displayed: false )
+   	sendEvent( name: "isDriving", value: isDriving, isStateChange: true, displayed: false )
+   	sendEvent( name: "latitude", value: latitude, isStateChange: true, displayed: false )
+   	sendEvent( name: "longitude", value: longitude, isStateChange: true, displayed: false )
+   	sendEvent( name: "since", value: since, isStateChange: true, displayed: false )
+	sendEvent( name: "speed", value: speed, isStateChange: true, displayed: false )
+   	sendEvent( name: "wifiState", value: wifiState, isStateChange: true, displayed: false )
 }
 
 def setMemberId (String memberId) {
