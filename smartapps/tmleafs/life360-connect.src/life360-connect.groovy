@@ -6,6 +6,7 @@
  *
  *	TMLEAFS REFRESH PATCH 06-12-2016 V1.1
  *	Updated Code to match Smartthings updates 12-05-2017 V1.2
+ *	Added updateMember function that pulls all usefull information Life360 provides for webCoRE use V2.0
  *	
  *  Copyright 2014 Jeff's Account
  *
@@ -243,7 +244,6 @@ def getCredentialsErrorPage(String message) {
 }
 
 def testLife360Connection() {
-
    	if (state.life360AccessToken)
    		true
     else
@@ -658,6 +658,8 @@ def updated() {
 
 def generateInitialEvent (member, childDevice) {
 
+    runEvery5Minutes(updateMembers)
+
     // lets figure out if the member is currently "home" (At the place)
     
     try { // we are going to just ignore any errors
@@ -665,11 +667,13 @@ def generateInitialEvent (member, childDevice) {
     	log.info "Life360 generateInitialEvent($member, $childDevice)"
         
         def place = state.places.find{it.id==settings.place}
-        
-        if (place) {
-        
+
+		if (place) {
+             
         	def memberLatitude = new Float (member.location.latitude)
             def memberLongitude = new Float (member.location.longitude)
+            def memberAddress1 = member.location.address1
+            def memberLocationName = member.location.name
             def placeLatitude = new Float (place.latitude)
             def placeLongitude = new Float (place.longitude)
             def placeRadius = new Float (place.radius)
@@ -691,14 +695,42 @@ def generateInitialEvent (member, childDevice) {
        		// def childDevice2 = getChildDevice("${app.id}.${member.id}")
 		
         	// log.debug "Child Device = ${childDevice2}"
+              
+        def address1
+        def address2
+        def speed
         
-        	childDevice?.generatePresenceEvent(isPresent, distanceAway)
+        if(member.location.address1 == null || member.location.address1 == "")
+        address1 = "No Data"
+        else
+        address1 = member.location.address1
         
-        	// log.debug "After generating presence event."
-            
-    	}
+        if(member.location.address2 == null || member.location.address2 == "")
+        address2 = "No Data"
+        else
+        address2 = member.location.address2
         
-	}
+		//Covert 0 1 to False True	
+	    def charging = member.location.charge == "0" ? "False" : "True"
+        def moving = member.location.inTransit == "0" ? "False" : "True"
+		def driving = member.location.isDriving == "0" ? "False" : "True"
+	    def wifi = member.location.wifiState == "0" ? "False" : "True"
+        
+        //Fix Iphone -1 speed 
+        if(member.location.speed == "-1")
+        speed = 0
+        else
+        speed = member.location.speed
+        
+		//Sent data	
+        childDevice?.extraInfo(address1,address2,member.location.battery,charging,member.location.endTimestamp,moving,driving,member.location.latitude,member.location.longitude,member.location.since,speed,wifi)
+        //childDevice?.extraInfo(member.location.address1,member.location.address2,member.location.battery,member.location.charge,member.location.endTimestamp,member.location.inTransit,member.location.isDriving,member.location.latitude,member.location.longitude,member.location.since,member.location.speed,member.location.wifiState)
+        
+        childDevice?.generatePresenceEvent(isPresent, distanceAway)
+        
+        // log.debug "After generating presence event."          
+    	}    
+     }
     catch (e) {
     	// eat it
     }
@@ -757,7 +789,6 @@ def placeEventHandler() {
     		log.warn "Life360 couldn't find child device associated with inbound Life360 event."
     	}
     }
-
 }
 
 def refresh() {
@@ -766,3 +797,68 @@ listPlaces()
 listUsers()
 updated()
 }
+
+def updateMembers(){
+	if (!state?.circle)
+    	state.circle = settings.circle
+    
+    	def url = "https://api.life360.com/v3/circles/${state.circle}/members.json"
+    	def result = null
+       
+	httpGet(uri: url, headers: ["Authorization": "Bearer ${state.life360AccessToken}" ]) {response -> 
+     	result = response
+	}
+
+	log.debug "Latest Members=${result.data}"
+    	def members = result.data.members
+    	state.members = members
+    
+	settings.users.each {memberId->
+    
+    	//log.debug "appid $app.id memberid $memberId"	
+    
+    	def externalId = "${app.id}.${memberId}"
+        
+        //log.debug "ExternalId = $externalId"
+        
+   	def member = state.members.find{it.id==memberId}
+
+        //log.debug "member = $member"
+
+	// find the appropriate child device based on my app id and the device network id
+
+	def deviceWrapper = getChildDevice("${externalId}")
+        
+        def address1
+        def address2
+        def speed
+        
+        if(member.location.address1 == null || member.location.address1 == "")
+        address1 = "No Data"
+        else
+        address1 = member.location.address1
+        
+        if(member.location.address2 == null || member.location.address2 == "")
+        address2 = "No Data"
+        else
+        address2 = member.location.address2
+        
+	//Covert 0 1 to False True	
+	def charging = member.location.charge == "0" ? "False" : "True"
+        def moving = member.location.inTransit == "0" ? "False" : "True"
+	def driving = member.location.isDriving == "0" ? "False" : "True"
+	def wifi = member.location.wifiState == "0" ? "False" : "True"
+        
+        //Fix Iphone -1 speed 
+        if(member.location.speed == "-1")
+        speed = 0
+        else
+        speed = member.location.speed
+        
+        //send data
+        deviceWrapper.extraInfo(address1,address2,member.location.battery,charging,member.location.endTimestamp,moving,driving,member.location.latitude,member.location.longitude,member.location.since,speed,wifi)
+        //deviceWrapper.extraInfo(member.location.address1,member.location.address2,member.location.battery,member.location.charge,member.location.endTimestamp,member.location.inTransit,member.location.isDriving,member.location.latitude,member.location.longitude,member.location.since,member.location.speed,member.location.wifiState)
+
+        }
+
+    }
