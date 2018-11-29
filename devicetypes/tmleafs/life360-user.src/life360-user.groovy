@@ -8,6 +8,7 @@
  *	Updated Code to match Smartthings updates 12-05-2017 V1.2
  *	Added Null Return on refresh to fix WebCoRE error 12-05-2017 V1.2
  *	Added updateMember function that pulls all usefull information Life360 provides for webCoRE use V2.0
+ *	Changed attribute types added Battery & Power Source capability 
  *
  *  Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except
  *  in compliance with the License. You may obtain a copy of the License at:
@@ -35,26 +36,31 @@ metadata {
 	capability "Sensor"
     capability "Refresh"
 	capability "Sleep Sensor"
+    capability "Battery"
+    capability "Power Source"
+    
 	attribute "distanceMetric", "Number"
    	attribute "distanceKm", "Number"
 	attribute "distanceMiles", "Number"
 	attribute "address1", "String"
   	attribute "address2", "String"
   	attribute "battery", "number"
-   	attribute "charge", "number"
+   	attribute "charge", "boolean"
    	attribute "lastCheckin", "number"
-   	attribute "inTransit", "number"
-   	attribute "isDriving", "number"
+   	attribute "inTransit", "boolean"
+   	attribute "isDriving", "boolean"
    	attribute "latitude", "number"
    	attribute "longitude", "number"
    	attribute "since", "number"
    	attribute "speed", "number"
-   	attribute "wifiState", "number"
+   	attribute "wifiState", "boolean"
 
 	command "refresh"
 	command "asleep"
     command "awake"
     command "toggleSleeping"
+    command "setBattery",["number","boolean"]
+    
 	
 	}
 
@@ -117,9 +123,9 @@ metadata {
             state("default", label:'Battery: ${currentValue}%')
         }
         
-        standardTile("charge", "device.charge", height: 1, width: 2, decoration: "flat") {
-            state "False", label: 'Charging: No'
-            state "True", label: 'Charging: Yes'
+        valueTile("charging", "device.powerSource", height: 1, width: 2, decoration: "flat"){
+        	state "battery", label: 'Charging: No'
+            state "dc", label: 'Charging: Yes'
         }
         
          standardTile("wifistate", "device.wifiState", height: 1, width: 2, decoration: "flat") {
@@ -158,7 +164,7 @@ metadata {
         }
 
 		main "presence"
-		details(["display", "presence", "sleeping", "lastLocationUpdate", "refresh", "blank","information", "blank", "address1", "address2", "battery", "charge", "wifistate", "lastcheckin", "since", "moving", "driving", "speed", "latitude", "longitude", "testing"])
+		details(["display", "presence", "sleeping", "lastLocationUpdate", "refresh", "blank","information", "blank", "address1", "address2", "battery", "charging", "wifistate", "lastcheckin", "since", "moving", "driving", "speed", "latitude", "longitude", "testing"])
 	}
 }
 
@@ -223,6 +229,8 @@ private extraInfo(address1,address2,battery,charge,endTimestamp,inTransit,isDriv
    	sendEvent( name: "since", value: since, isStateChange: true, displayed: false )
 	sendEvent( name: "speed", value: speed, isStateChange: true, displayed: false )
    	sendEvent( name: "wifiState", value: wifiState, isStateChange: true, displayed: false )
+
+   	setBattery(battery.toInteger(), charge.toBoolean());
 }
 
 def setMemberId (String memberId) {
@@ -285,6 +293,13 @@ def awake() {
 def refresh() {
 	parent.refresh()
     return null
+}
+
+def setBattery(int percent, boolean charging){
+	if(percent != device.currentValue("battery"))
+		sendEvent(name: "battery", value: percent, isStateChange: true, displayed: false);
+    if(charging != device.currentValue("charging"))
+		sendEvent(name: "powerSource", value: (charging ? "dc":"battery"), isStateChange: true, displayed: false);
 }
 
 private formatLocalTime(format = "EEE, MMM d yyyy @ h:mm:ss a z", time = now()) {
