@@ -809,7 +809,7 @@ def updateMembers(){
      	result = response
 	}
 
-	log.debug "Latest Members=${result.data}"
+	//log.debug "Latest Members=${result.data}"
     	def members = result.data.members
     	state.members = members
     
@@ -850,10 +850,10 @@ def updateMembers(){
 	def wifi = member.location.wifiState == "0" ? "False" : "True"
         
         //Fix Iphone -1 speed 
-        if(member.location.speed == "-1")
+        if(member.location.speed.toInteger() == "-1")
         speed = 0
         else
-        speed = member.location.speed
+        speed = member.location.speed.toInteger()
         
         //send data
         deviceWrapper.extraInfo(address1,address2,member.location.battery,charging,member.location.endTimestamp,moving,driving,member.location.latitude,member.location.longitude,member.location.since,speed,wifi)
