@@ -216,18 +216,31 @@ def generatePresenceEvent(boolean present, homeDistance) {
 }
 
 private extraInfo(address1,address2,battery,charge,endTimestamp,inTransit,isDriving,latitude,longitude,since,speed,wifiState){
-	log.debug "extrainfo = Address 1 = $address1 | Address 2 = $address2 | Battery = $battery | Charging = $charge | Last Checkin = $endTimestamp | Moving = $inTransit | Driving = $isDriving | Latitude = $latitude | Longitude = $longitude | Since = $since | Speed = $speed | Wifi = $wifiState"
-   	sendEvent( name: "address1", value: address1, isStateChange: true, displayed: false )
+	//log.debug "extrainfo = Address 1 = $address1 | Address 2 = $address2 | Battery = $battery | Charging = $charge | Last Checkin = $endTimestamp | Moving = $inTransit | Driving = $isDriving | Latitude = $latitude | Longitude = $longitude | Since = $since | Speed = $speed | Wifi = $wifiState"
+	
+	if(address1 != device.currentValue('address1'))
+    sendEvent( name: "address1", value: address1, isStateChange: true, displayed: false )
+    if(address2 != device.currentValue('address2'))
     sendEvent( name: "address2", value: address2, isStateChange: true, displayed: false )
+    if(battery != device.currentValue('battery'))
    	sendEvent( name: "battery", value: battery, isStateChange: true, displayed: false )
+    if(charge != device.currentValue('charge'))
    	sendEvent( name: "charge", value: charge, isStateChange: true, displayed: false )
+    if(lastCheckin != device.currentValue('lastCheckin'))
    	sendEvent( name: "lastCheckin", value: endTimestamp, isStateChange: true, displayed: false )
+    if(inTransit != device.currentValue('inTransit'))
    	sendEvent( name: "inTransit", value: inTransit, isStateChange: true, displayed: false )
+    if(isDriving != device.currentValue('isDriving'))
    	sendEvent( name: "isDriving", value: isDriving, isStateChange: true, displayed: false )
+    if(latitude != device.currentValue('latitude'))
    	sendEvent( name: "latitude", value: latitude, isStateChange: true, displayed: false )
+    if(longitude != device.currentValue('longitude'))
    	sendEvent( name: "longitude", value: longitude, isStateChange: true, displayed: false )
+    if(since != device.currentValue('since'))
    	sendEvent( name: "since", value: since, isStateChange: true, displayed: false )
+    if(speed != device.currentValue('speed'))
 	sendEvent( name: "speed", value: speed, isStateChange: true, displayed: false )
+    if(wifiState != device.currentValue('wifiState'))
    	sendEvent( name: "wifiState", value: wifiState, isStateChange: true, displayed: false )
 
    	setBattery(battery.toInteger(), charge.toBoolean());
