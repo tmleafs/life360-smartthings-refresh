@@ -42,6 +42,8 @@ metadata {
 	attribute "distanceMetric", "Number"
    	attribute "distanceKm", "Number"
 	attribute "distanceMiles", "Number"
+    attribute "prevAddress1", "String"
+    attribute "prevAddress2", "String"
 	attribute "address1", "String"
   	attribute "address2", "String"
   	attribute "battery", "number"
@@ -217,12 +219,16 @@ def generatePresenceEvent(boolean present, homeDistance) {
 
 private extraInfo(address1,address2,battery,charge,endTimestamp,inTransit,isDriving,latitude,longitude,since,speed,wifiState){
 	//log.debug "extrainfo = Address 1 = $address1 | Address 2 = $address2 | Battery = $battery | Charging = $charge | Last Checkin = $endTimestamp | Moving = $inTransit | Driving = $isDriving | Latitude = $latitude | Longitude = $longitude | Since = $since | Speed = $speed | Wifi = $wifiState"
-	
-	if(address1 != device.currentValue('address1'))
+	   
+	if(address1 != device.currentValue('address1')){
+    sendEvent( name: "prevAddress1", value: device.currentValue('address1'), isStateChange: true, displayed: false )
     sendEvent( name: "address1", value: address1, isStateChange: true, displayed: false )
-    if(address2 != device.currentValue('address2'))
-    sendEvent( name: "address2", value: address2, isStateChange: true, displayed: false )
-    if(battery != device.currentValue('battery'))
+	}
+    if(address2 != device.currentValue('address2')){
+    sendEvent( name: "prevAddress2", value: device.currentValue('address2'), isStateChange: true, displayed: false )
+    sendEvent( name: "address2", value: address2, isStateChange: true, displayed: false )   
+	}
+	if(battery != device.currentValue('battery'))
    	sendEvent( name: "battery", value: battery, isStateChange: true, displayed: false )
     if(charge != device.currentValue('charge'))
    	sendEvent( name: "charge", value: charge, isStateChange: true, displayed: false )
