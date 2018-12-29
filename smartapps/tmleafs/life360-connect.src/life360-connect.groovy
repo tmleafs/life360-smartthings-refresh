@@ -658,7 +658,7 @@ def updated() {
 
 def generateInitialEvent (member, childDevice) {
 
-    runEvery5Minutes(updateMembers)
+    runEvery1Minute(updateMembers)
 
     // lets figure out if the member is currently "home" (At the place)
     
@@ -699,6 +699,9 @@ def generateInitialEvent (member, childDevice) {
         def address1
         def address2
         def speed
+        def speedmeters
+        def speedMPH
+        def speedKPH 
         
         if(member.location.address1 == null || member.location.address1 == "")
         address1 = "No Data"
@@ -711,19 +714,36 @@ def generateInitialEvent (member, childDevice) {
         address2 = member.location.address2
         
 		//Covert 0 1 to False True	
-	    def charging = member.location.charge == "0" ? "False" : "True"
-        def moving = member.location.inTransit == "0" ? "False" : "True"
-		def driving = member.location.isDriving == "0" ? "False" : "True"
-	    def wifi = member.location.wifiState == "0" ? "False" : "True"
+	    def charging = member.location.charge == "0" ? "false" : "true"
+        def moving = member.location.inTransit == "0" ? "false" : "true"
+		def driving = member.location.isDriving == "0" ? "false" : "true"
+	    def wifi = member.location.wifiState == "0" ? "false" : "true"
         
         //Fix Iphone -1 speed 
-        if(member.location.speed == "-1")
+        if(member.location.speed.toFloat() == -1){
         speed = 0
+        speed = speed.toFloat()}
         else
-        speed = member.location.speed
+        speed = member.location.speed.toFloat()
+
+		if(speed > 0 ){
+        speedmeters = speed.toDouble().round(2)
+        speedMPH = speedmeters.toFloat() * 2.23694
+        speedMPH = speedMPH.toDouble().round(2)
+        speedKPH = speedmeters.toFloat() * 3.6
+        speedKPH = speedKPH.toDouble().round(2)
+        }else{
+        speedmeters = 0
+        speedMPH = 0
+        speedKPH = 0
+        }
+        
+        def battery = Math.round(member.location.battery.toDouble())
+        def latitude = member.location.latitude.toFloat()
+        def longitude = member.location.longitude.toFloat()
         
 		//Sent data	
-        childDevice?.extraInfo(address1,address2,member.location.battery,charging,member.location.endTimestamp,moving,driving,member.location.latitude,member.location.longitude,member.location.since,speed,wifi)
+        childDevice?.extraInfo(address1,address2,battery,charging,member.location.endTimestamp,moving,driving,latitude,longitude,member.location.since,speedmeters,speedMPH,speedKPH,wifi)
         //childDevice?.extraInfo(member.location.address1,member.location.address2,member.location.battery,member.location.charge,member.location.endTimestamp,member.location.inTransit,member.location.isDriving,member.location.latitude,member.location.longitude,member.location.since,member.location.speed,member.location.wifiState)
         
         childDevice?.generatePresenceEvent(isPresent, distanceAway)
@@ -832,7 +852,10 @@ def updateMembers(){
         def address1
         def address2
         def speed
-        
+        def speedMetric
+        def speedMiles
+        def speedKm
+                
         if(member.location.address1 == null || member.location.address1 == "")
         address1 = "No Data"
         else
@@ -843,22 +866,36 @@ def updateMembers(){
         else
         address2 = member.location.address2
         
-	//Covert 0 1 to False True	
-	def charging = member.location.charge == "0" ? "False" : "True"
-        def moving = member.location.inTransit == "0" ? "False" : "True"
-	def driving = member.location.isDriving == "0" ? "False" : "True"
-	def wifi = member.location.wifiState == "0" ? "False" : "True"
+		//Covert 0 1 to False True	
+		def charging = member.location.charge == "0" ? "false" : "true"
+        def moving = member.location.inTransit == "0" ? "false" : "true"
+		def driving = member.location.isDriving == "0" ? "false" : "true"
+		def wifi = member.location.wifiState == "0" ? "false" : "true"
         
         //Fix Iphone -1 speed 
-        if(member.location.speed.toInteger() == "-1")
+        if(member.location.speed.toFloat() == -1){
         speed = 0
+        speed = speed.toFloat()}
         else
-        speed = member.location.speed.toInteger()
+        speed = member.location.speed.toFloat()
         
-        //send data
-        deviceWrapper.extraInfo(address1,address2,member.location.battery,charging,member.location.endTimestamp,moving,driving,member.location.latitude,member.location.longitude,member.location.since,speed,wifi)
-        //deviceWrapper.extraInfo(member.location.address1,member.location.address2,member.location.battery,member.location.charge,member.location.endTimestamp,member.location.inTransit,member.location.isDriving,member.location.latitude,member.location.longitude,member.location.since,member.location.speed,member.location.wifiState)
-
+		if(speed > 0 ){
+        speedMetric = speed.toDouble().round(2)
+        speedMiles = speedMetric.toFloat() * 2.23694
+        speedMiles = speedMiles.toDouble().round(2)
+        speedKm = speedMetric.toFloat() * 3.6
+        speedKm = speedKm.toDouble().round(2)
+        }else{
+        speedMetric = 0
+        speedMiles = 0
+        speedKm = 0
         }
-
+                
+        def battery = Math.round(member.location.battery.toDouble())
+        def latitude = member.location.latitude.toFloat()
+        def longitude = member.location.longitude.toFloat()
+        //log.debug "extrainfo = Address 1 = $address1 | Address 2 = $address2 | Battery = $battery | Charging = $charging | Last Checkin = $member.location.endTimestamp | Moving = $moving | Driving = $driving | Latitude = $latitude | Longitude = $longitude | Since = $member.location.since | Speedmeters = $speedMetric | SpeedMPH = $speedMiles | SpeedKPH = $speedKm | Wifi = $wifi"
+		//Sent data	
+        deviceWrapper.extraInfo(address1,address2,battery,charging,member.location.endTimestamp,moving,driving,latitude,longitude,member.location.since,speedMetric,speedMiles,speedKm,wifi)
+        }
     }
