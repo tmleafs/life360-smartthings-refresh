@@ -54,7 +54,9 @@ metadata {
    	attribute "latitude", "number"
    	attribute "longitude", "number"
    	attribute "since", "number"
-   	attribute "speed", "number"
+   	attribute "speedMetric", "number"
+    attribute "speedMiles", "number"
+    attribute "speedKm", "number"
    	attribute "wifiState", "boolean"
 
 	command "refresh"
@@ -131,8 +133,8 @@ metadata {
         }
         
          standardTile("wifistate", "device.wifiState", height: 1, width: 2, decoration: "flat") {
-            state "False", label: 'Wifi: Off'
-            state "True", label: 'Wifi: On'
+            state "false", label: 'Wifi: Off'
+            state "true", label: 'Wifi: On'
         }
         
         standardTile("lastcheckin", "device.lastCheckin", height: 1, width: 3, decoration: "flat") {
@@ -143,18 +145,26 @@ metadata {
             state("default", label:'In Location Since: ${currentValue}')
         }
         
-        standardTile("moving", "device.inTransit", height: 1, width: 2, decoration: "flat") {
-            state "False", label: 'Moving: No'
-            state "True", label: 'Moving: Yes'
+        standardTile("moving", "device.inTransit", height: 1, width: 3, decoration: "flat") {
+            state "false", label: 'Moving: No'
+            state "true", label: 'Moving: Yes'
         }
         
-        standardTile("driving", "device.isDriving", height: 1, width: 2, decoration: "flat") {
-            state "False", label: 'Driving: No'
-            state "True", label: 'Driving: Yes'
+        standardTile("driving", "device.isDriving", height: 1, width: 3, decoration: "flat") {
+            state "false", label: 'Driving: No'
+            state "true", label: 'Driving: Yes'
         }
         
-        standardTile("speed", "device.speed", height: 1, width: 2, decoration: "flat") {
-            state("default", label:'Speed: ${currentValue}')
+        standardTile("speedMetric", "device.speedMetric", height: 1, width: 2, decoration: "flat") {
+            state("default", label:'MPS: ${currentValue}')
+        }
+        
+        standardTile("speedMPH", "device.speedMiles", height: 1, width: 2, decoration: "flat") {
+            state("default", label:'MPH: ${currentValue}')
+        }
+        
+        standardTile("speedKPH", "device.speedKm", height: 1, width: 2, decoration: "flat") {
+            state("default", label:'KPH: ${currentValue}')
         }
         
         standardTile("latitude", "device.latitude", height: 1, width: 3, decoration: "flat") {
@@ -166,7 +176,7 @@ metadata {
         }
 
 		main "presence"
-		details(["display", "presence", "sleeping", "lastLocationUpdate", "refresh", "blank","information", "blank", "address1", "address2", "battery", "charging", "wifistate", "lastcheckin", "since", "moving", "driving", "speed", "latitude", "longitude", "testing"])
+		details(["display", "presence", "sleeping", "lastLocationUpdate", "refresh", "blank","information", "blank", "address1", "address2", "battery", "charging", "wifistate", "lastcheckin", "since", "moving", "driving", "speedMetric", "speedMPH", "speedKPH","latitude", "longitude", "testing"])
 	}
 }
 
@@ -208,17 +218,17 @@ def generatePresenceEvent(boolean present, homeDistance) {
 	}
 	
     def km = sprintf("%.2f", homeDistance / 1000)
-    sendEvent( name: "distanceKm", value: km, isStateChange: true, displayed: false )
+    sendEvent( name: "distanceKm", value: km.toDouble().round(2), isStateChange: true, displayed: false )
     def miles = sprintf("%.2f", (homeDistance / 1000) / 1.609344)
-   	sendEvent( name: "distanceMiles", value: miles, isStateChange: true, displayed: false )
+   	sendEvent( name: "distanceMiles", value: miles.toDouble().round(2), isStateChange: true, displayed: false )
 
-	sendEvent( name: "distanceMetric", value: homeDistance, isStateChange: true, displayed: false )
+	sendEvent( name: "distanceMetric", value: homeDistance.toDouble().round(2), isStateChange: true, displayed: false )
 	
 	sendEvent( name: "lastLocationUpdate", value: "Last location update on:\r\n${formatLocalTime("MM/dd/yyyy @ h:mm:ss a")}", displayed: false ) 
 }
 
-private extraInfo(address1,address2,battery,charge,endTimestamp,inTransit,isDriving,latitude,longitude,since,speed,wifiState){
-	//log.debug "extrainfo = Address 1 = $address1 | Address 2 = $address2 | Battery = $battery | Charging = $charge | Last Checkin = $endTimestamp | Moving = $inTransit | Driving = $isDriving | Latitude = $latitude | Longitude = $longitude | Since = $since | Speed = $speed | Wifi = $wifiState"
+private extraInfo(address1,address2,battery,charge,endTimestamp,inTransit,isDriving,latitude,longitude,since,speedMetric,speedMiles,speedKm,wifiState){
+	//log.debug "extrainfo = Address 1 = $address1 | Address 2 = $address2 | Battery = $battery | Charging = $charge | Last Checkin = $endTimestamp | Moving = $inTransit | Driving = $isDriving | Latitude = $latitude | Longitude = $longitude | Since = $since | Speedmeters = $speedMetric | SpeedMPH = $speedMiles | SpeedKPH = $speedKm | Wifi = $wifiState"
 	   
 	if(address1 != device.currentValue('address1')){
     sendEvent( name: "prevAddress1", value: device.currentValue('address1'), isStateChange: true, displayed: false )
@@ -232,24 +242,34 @@ private extraInfo(address1,address2,battery,charge,endTimestamp,inTransit,isDriv
    	sendEvent( name: "battery", value: battery, isStateChange: true, displayed: false )
     if(charge != device.currentValue('charge'))
    	sendEvent( name: "charge", value: charge, isStateChange: true, displayed: false )
-    if(lastCheckin != device.currentValue('lastCheckin'))
+    
+    def curcheckin = device.currentValue('lastCheckin').toString()
+    if(endTimestamp != curcheckin)
    	sendEvent( name: "lastCheckin", value: endTimestamp, isStateChange: true, displayed: false )
     if(inTransit != device.currentValue('inTransit'))
    	sendEvent( name: "inTransit", value: inTransit, isStateChange: true, displayed: false )
     if(isDriving != device.currentValue('isDriving'))
    	sendEvent( name: "isDriving", value: isDriving, isStateChange: true, displayed: false )
-    if(latitude != device.currentValue('latitude'))
-   	sendEvent( name: "latitude", value: latitude, isStateChange: true, displayed: false )
-    if(longitude != device.currentValue('longitude'))
+
+	def curlat = device.currentValue('latitude').toString()
+    def curlong = device.currentValue('longitude').toString()
+    latitude = latitude.toString()
+    longitude = longitude.toString()
+    if(latitude != curlat)
+    sendEvent( name: "latitude", value: latitude, isStateChange: true, displayed: false )
+    if(longitude != curlong)
    	sendEvent( name: "longitude", value: longitude, isStateChange: true, displayed: false )
     if(since != device.currentValue('since'))
    	sendEvent( name: "since", value: since, isStateChange: true, displayed: false )
-    if(speed != device.currentValue('speed'))
-	sendEvent( name: "speed", value: speed, isStateChange: true, displayed: false )
+    if(speedMetric != device.currentValue('speedMetric'))
+	sendEvent( name: "speedMetric", value: speedMetric, isStateChange: true, displayed: false )
+    if(speedMiles != device.currentValue('speedMiles'))
+	sendEvent( name: "speedMiles", value: speedMiles, isStateChange: true, displayed: false )
+    if(speedKm != device.currentValue('speedKm'))
+	sendEvent( name: "speedKm", value: speedKm, isStateChange: true, displayed: false )
     if(wifiState != device.currentValue('wifiState'))
    	sendEvent( name: "wifiState", value: wifiState, isStateChange: true, displayed: false )
-
-   	setBattery(battery.toInteger(), charge.toBoolean());
+   	setBattery(battery.toInteger(), charge.toBoolean(), charge.toString())
 }
 
 def setMemberId (String memberId) {
@@ -314,10 +334,12 @@ def refresh() {
     return null
 }
 
-def setBattery(int percent, boolean charging){
+def setBattery(int percent, boolean charging, charge){
 	if(percent != device.currentValue("battery"))
 		sendEvent(name: "battery", value: percent, isStateChange: true, displayed: false);
-    if(charging != device.currentValue("charging"))
+        
+    def ps = device.currentValue("powerSource") == "battery" ? "false" : "true"
+    if(charge != ps)
 		sendEvent(name: "powerSource", value: (charging ? "dc":"battery"), isStateChange: true, displayed: false);
 }
 
