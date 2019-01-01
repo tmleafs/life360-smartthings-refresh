@@ -897,5 +897,34 @@ def updateMembers(){
         //log.debug "extrainfo = Address 1 = $address1 | Address 2 = $address2 | Battery = $battery | Charging = $charging | Last Checkin = $member.location.endTimestamp | Moving = $moving | Driving = $driving | Latitude = $latitude | Longitude = $longitude | Since = $member.location.since | Speedmeters = $speedMetric | SpeedMPH = $speedMiles | SpeedKPH = $speedKm | Wifi = $wifi"
 		//Sent data	
         deviceWrapper.extraInfo(address1,address2,battery,charging,member.location.endTimestamp,moving,driving,latitude,longitude,member.location.since,speedMetric,speedMiles,speedKm,wifi)
-        }
-    }
+        
+        log.debug "Setting.place = $settings.place"
+        
+        def place = state.places.find{it.id==settings.place}
+		log.debug "place = $place"
+		if (place) {
+             
+        	def memberLatitude = new Float (member.location.latitude)
+            def memberLongitude = new Float (member.location.longitude)
+            def memberAddress1 = member.location.address1
+            def memberLocationName = member.location.name
+            def placeLatitude = new Float (place.latitude)
+            def placeLongitude = new Float (place.longitude)
+            def placeRadius = new Float (place.radius)
+        
+        	log.debug "Member Location = ${memberLatitude}/${memberLongitude}"
+            log.debug "Place Location = ${placeLatitude}/${placeLongitude}"
+            log.debug "Place Radius = ${placeRadius}"
+        
+        	def distanceAway = haversine(memberLatitude, memberLongitude, placeLatitude, placeLongitude)*1000 // in meters
+  
+        	log.debug "Distance Away = ${distanceAway}"
+  
+  			boolean isPresent = (distanceAway <= placeRadius)
+
+			log.info "Life360 Update member: ($memberLatitude, $memberLongitude), place: ($placeLatitude, $placeLongitude), radius: $placeRadius, dist: $distanceAway, present: $isPresent"
+  			
+            deviceWrapper.generatePresenceEvent(isPresent, distanceAway)
+            }
+       }     
+}
