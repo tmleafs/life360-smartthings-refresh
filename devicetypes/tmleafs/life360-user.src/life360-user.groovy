@@ -210,10 +210,12 @@ def generatePresenceEvent(boolean present, homeDistance) {
 	sendEvent (results)
 	
     if(units == "Kilometers" || units == null || units == ""){
-	def status = sprintf("%.2f", homeDistance / 1000) + " km from: Home"
+	def statusDistance = homeDistance / 1000
+	def status = sprintf("%.2f", statusDistance.toDouble().round(2)) + " km from: Home"
     sendEvent( name: "status", value: status, isStateChange: true, displayed: false )
     }else{
-   	def status = sprintf("%.2f", (homeDistance / 1000) / 1.609344) + " Miles from: Home"
+	def statusDistance = (homeDistance / 1000) / 1.609344 
+   	def status = sprintf("%.2f", statusDistance.toDouble().round(2)) + " Miles from: Home"
    	sendEvent( name: "status", value: status, isStateChange: true, displayed: false )
 	}
 	
@@ -248,9 +250,13 @@ private extraInfo(address1,address2,battery,charge,endTimestamp,inTransit,isDriv
    	sendEvent( name: "lastCheckin", value: endTimestamp, isStateChange: true, displayed: false )
     if(inTransit != device.currentValue('inTransit'))
    	sendEvent( name: "inTransit", value: inTransit, isStateChange: true, displayed: false )
-    if(isDriving != device.currentValue('isDriving'))
+    
+	def curDriving = device.currentValue('isDriving')
+    log.debug "Current Driving Status = $curDriving - New Driving Status = $isDriving"
+    if(isDriving != device.currentValue('isDriving')){
+	log.debug "If was different, isDriving = $isDriving"
    	sendEvent( name: "isDriving", value: isDriving, isStateChange: true, displayed: false )
-
+    }
 	def curlat = device.currentValue('latitude').toString()
     def curlong = device.currentValue('longitude').toString()
     latitude = latitude.toString()
