@@ -252,9 +252,9 @@ private extraInfo(address1,address2,battery,charge,endTimestamp,inTransit,isDriv
    	sendEvent( name: "inTransit", value: inTransit, isStateChange: true, displayed: false )
     
 	def curDriving = device.currentValue('isDriving')
-    log.debug "Current Driving Status = $curDriving - New Driving Status = $isDriving"
+    //log.debug "Current Driving Status = $curDriving - New Driving Status = $isDriving"
     if(isDriving != device.currentValue('isDriving')){
-	log.debug "If was different, isDriving = $isDriving"
+	//log.debug "If was different, isDriving = $isDriving"
    	sendEvent( name: "isDriving", value: isDriving, isStateChange: true, displayed: false )
     }
 	def curlat = device.currentValue('latitude').toString()
