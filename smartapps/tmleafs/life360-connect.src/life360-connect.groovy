@@ -778,7 +778,8 @@ def haversine(lat1, lon1, lat2, lon2) {
 
 def placeEventHandler() {
 
-	log.info "Life360 placeEventHandler: params=$params, settings.place=$settings.place"
+	log.info "Life360 placeEventHandler: params=$params"
+    log.info "Life360 placeEventHandler: settings.place=$settings.place"
 
 	// the POST to this end-point will look like:
     // POST http://test.com/webhook?circleId=XXXX&placeId=XXXX&userId=XXXX&direction=arrive
@@ -918,7 +919,7 @@ def updateMembers(){
   
   			boolean isPresent = (distanceAway <= placeRadius)
 
-			log.info "Life360 Update member: ($memberLatitude, $memberLongitude), place: ($placeLatitude, $placeLongitude), radius: $placeRadius, dist: $distanceAway, present: $isPresent"
+			log.info "Life360 Update member ($member.firstName): ($memberLatitude, $memberLongitude), place: ($placeLatitude, $placeLongitude), radius: $placeRadius, dist: $distanceAway, present: $isPresent"
   			
             deviceWrapper.generatePresenceEvent(isPresent, distanceAway)
             }
