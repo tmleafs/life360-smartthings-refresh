@@ -820,6 +820,10 @@ updated()
 }
 
 def updateMembers(){
+    
+	if(state.delay == true)
+	{
+	log.debug "RUN" 
 	if (!state?.circle)
     	state.circle = settings.circle
     
@@ -922,6 +926,12 @@ def updateMembers(){
 			log.info "Life360 Update member ($member.firstName): ($memberLatitude, $memberLongitude), place: ($placeLatitude, $placeLongitude), radius: $placeRadius, dist: $distanceAway, present: $isPresent"
   			
             deviceWrapper.generatePresenceEvent(isPresent, distanceAway)
+			state.delay = false
             }
-       }     
+       }
+    }else{
+    state.delay = true
+	log.debug "DONT RUN"
+    }
+		      
 }
