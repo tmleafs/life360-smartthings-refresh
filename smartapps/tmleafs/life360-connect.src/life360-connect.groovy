@@ -810,6 +810,12 @@ def placeEventHandler() {
     		log.warn "Life360 couldn't find child device associated with inbound Life360 event."
     	}
     }
+    state.pause = true
+    runIn(60*4, resettimer)
+}
+
+def resettimer(){
+state.pause = false
 }
 
 def refresh() {
@@ -820,10 +826,9 @@ updated()
 }
 
 def updateMembers(){
-    
-	if(state.delay == true)
-	{
-	log.debug "RUN" 
+
+	if(state.pause == false || state.pause == null){
+	
 	if (!state?.circle)
     	state.circle = settings.circle
     
@@ -926,12 +931,7 @@ def updateMembers(){
 			log.info "Life360 Update member ($member.firstName): ($memberLatitude, $memberLongitude), place: ($placeLatitude, $placeLongitude), radius: $placeRadius, dist: $distanceAway, present: $isPresent"
   			
             deviceWrapper.generatePresenceEvent(isPresent, distanceAway)
-			state.delay = false
             }
-       }
-    }else{
-    state.delay = true
-	log.debug "DONT RUN"
-    }
-		      
+       }     
+}
 }
