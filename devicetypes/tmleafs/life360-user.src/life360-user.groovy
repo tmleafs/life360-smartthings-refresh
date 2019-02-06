@@ -212,21 +212,34 @@ def generatePresenceEvent(boolean present, homeDistance) {
     if(units == "Kilometers" || units == null || units == ""){
 	def statusDistance = homeDistance / 1000
 	def status = sprintf("%.2f", statusDistance.toDouble().round(2)) + " km from: Home"
+    if(status != device.currentValue('status')){
     sendEvent( name: "status", value: status, isStateChange: true, displayed: false )
+    state.update = true}
     }else{
 	def statusDistance = (homeDistance / 1000) / 1.609344 
    	def status = sprintf("%.2f", statusDistance.toDouble().round(2)) + " Miles from: Home"
+    if(status != device.currentValue('status')){
    	sendEvent( name: "status", value: status, isStateChange: true, displayed: false )
+    state.update = true}
 	}
 	
     def km = sprintf("%.2f", homeDistance / 1000)
+    if(km.toDouble().round(2) != device.currentValue('distanceKm')){
     sendEvent( name: "distanceKm", value: km.toDouble().round(2), isStateChange: true, displayed: false )
+    state.update = true}
+    
     def miles = sprintf("%.2f", (homeDistance / 1000) / 1.609344)
-   	sendEvent( name: "distanceMiles", value: miles.toDouble().round(2), isStateChange: true, displayed: false )
-
+	if(miles.toDouble().round(2) != device.currentValue('distanceMiles')){    
+    sendEvent( name: "distanceMiles", value: miles.toDouble().round(2), isStateChange: true, displayed: false )
+	state.update = true}
+    
+    if(homeDistance.toDouble().round(2) != device.currentValue('distanceMetric')){
 	sendEvent( name: "distanceMetric", value: homeDistance.toDouble().round(2), isStateChange: true, displayed: false )
-	
+	state.update = true}
+    
+    if(state.update == true){
 	sendEvent( name: "lastLocationUpdate", value: "Last location update on:\r\n${formatLocalTime("MM/dd/yyyy @ h:mm:ss a")}", displayed: false ) 
+	state.update = false}
 }
 
 private extraInfo(address1,address2,battery,charge,endTimestamp,inTransit,isDriving,latitude,longitude,since,speedMetric,speedMiles,speedKm,wifiState){
@@ -257,7 +270,7 @@ private extraInfo(address1,address2,battery,charge,endTimestamp,inTransit,isDriv
 	//log.debug "If was different, isDriving = $isDriving"
    	sendEvent( name: "isDriving", value: isDriving, isStateChange: true, displayed: false )
     }
-	def curlat = device.currentValue('latitude').toString()
+    def curlat = device.currentValue('latitude').toString()
     def curlong = device.currentValue('longitude').toString()
     latitude = latitude.toString()
     longitude = longitude.toString()
