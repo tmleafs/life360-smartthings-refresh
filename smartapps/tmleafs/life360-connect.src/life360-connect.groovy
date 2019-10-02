@@ -907,7 +907,10 @@ def updateMembers(){
             def memberLocationName = member.location.name
             def placeLatitude = new Float (place.latitude)
             def placeLongitude = new Float (place.longitude)
-            def placeRadius = new Float (place.radius)
+            
+	    //Radius is 20% larger if currently present, otherwise normal radius
+	    def placeRadius = (deviceWrapper.currentValue('presence').toLowerCase() == 'present') ? new Float(place.radius) * 1.20 : new Float(place.radius)
+	    //def placeRadius = new Float (place.radius)
         
         	//log.debug "Member Location = ${memberLatitude}/${memberLongitude}"
             //log.debug "Place Location = ${placeLatitude}/${placeLongitude}"
