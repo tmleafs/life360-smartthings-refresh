@@ -31,7 +31,6 @@ preferences {
 } 
  
 metadata {
-	metadata {
 definition (name: "Life360 User", namespace: "tmleafs", author: "tmleafs", mnmn:"SmartThings", vid:"generic-arrival") {
 	capability "Presence Sensor"
 	capability "Sensor"
