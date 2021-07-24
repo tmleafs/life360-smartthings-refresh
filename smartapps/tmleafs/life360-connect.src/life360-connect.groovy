@@ -364,7 +364,7 @@ def listPlaces() {
 
 	// call life360 and get the list of places in the circle
     
- 	def url = "https://api.life360.com/v3/circles/${state.circle}/places.json"
+ 	def url = "https://api.life360.com/v3/circles/${state.circle}/allplaces.json"
  
     def result = null
        
